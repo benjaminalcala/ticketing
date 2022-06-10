@@ -5,7 +5,7 @@ import {requireAuth, validateRequest, NotFoundError, NotAuthorizedError} from '@
 import { Ticket } from '../models/ticket';
 
 import { TicketUpdatedPublisher } from '../events/publisher/ticket-updated-publisher';
-import { natsWrapper } from '../natsWrapper';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
