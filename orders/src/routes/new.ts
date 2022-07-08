@@ -42,6 +42,7 @@ router.post('/api/orders', requireAuth, [
     expiresAt: expiration,
     ticket
   })
+  await order.save();
 
   res.status(201).send(order);
 })

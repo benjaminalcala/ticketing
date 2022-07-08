@@ -4,12 +4,12 @@ import {Order, OrderStatus} from './order';
 
 
 interface TicketAttrs {
-  name: string;
+  title: string;
   price: number;
 }
 
 export interface TicketDoc extends mongoose.Document{
-  name: string;
+  title: string;
   price: number;
   isReserved(): Promise<boolean>;
 }
@@ -20,7 +20,7 @@ interface TicketModel extends mongoose.Model<TicketDoc>{
 
 
 const ticketSchema = new mongoose.Schema({
-  name: {
+  title: {
     type: String,
     required: true
   },

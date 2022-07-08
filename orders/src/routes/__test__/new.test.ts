@@ -19,7 +19,7 @@ it('returns a 404 when trying to create an order with an invalid ticket', async 
 
 it('returns a 400 when trying to create an order with a reserved ticket', async () => {
   const ticket = Ticket.build({
-    name: 'order',
+    title: 'order',
     price: 200
   })
   await ticket.save();
@@ -42,7 +42,7 @@ it('returns a 400 when trying to create an order with a reserved ticket', async 
 
 it('returns a 201 when successfully creating an order', async () => {
   const ticket = new Ticket({
-    name: 'order',
+    title: 'order',
     price: 200
   })
   await ticket.save();
