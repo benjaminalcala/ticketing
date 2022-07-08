@@ -4,6 +4,8 @@ import { body } from 'express-validator';
 import {requireAuth, validateRequest, NotFoundError, BadRequestError} from '@bamtickets/common';
 import { Ticket } from '../models/ticket';
 import { Order, OrderStatus } from '../models/order';
+import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const EXPIRATION_WINDOW_SECONDS = 60 * 15;
 
@@ -43,6 +45,17 @@ router.post('/api/orders', requireAuth, [
     ticket
   })
   await order.save();
+
+  new OrderCreatedPublisher(natsWrapper.client).publish({
+    id: order.id,
+    expiresAt: order.expiresAt.toISOString(),
+    userId: order.userId,
+    status: order.status,
+    ticket:{
+      id: ticket.id,
+      price: ticket.price
+    }
+  })
 
   res.status(201).send(order);
 })
