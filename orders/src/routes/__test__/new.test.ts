@@ -3,7 +3,7 @@ import request from 'supertest';
 import {app} from '../../app';
 import { Order, OrderStatus } from '../../models/order';
 import { Ticket } from '../../models/ticket';
-
+import {natsWrapper} from '../../nats-wrapper';
 
 it('returns a 404 when trying to create an order with an invalid ticket', async () => {
   const ticketId = new mongoose.Types.ObjectId();
@@ -54,5 +54,22 @@ it('returns a 201 when successfully creating an order', async () => {
   .expect(201)
 
   
+})
+
+it('emits an order created event', async () => {
+  const ticket = new Ticket({
+    title: 'order',
+    price: 200
+  })
+  await ticket.save();
+
+  await request(app)
+  .post('/api/orders')
+  .set('Cookie', global.signin())
+  .send({ticketId: ticket.id})
+  .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+
 })
 
