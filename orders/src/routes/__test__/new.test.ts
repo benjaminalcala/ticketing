@@ -19,6 +19,7 @@ it('returns a 404 when trying to create an order with an invalid ticket', async 
 
 it('returns a 400 when trying to create an order with a reserved ticket', async () => {
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'order',
     price: 200
   })
@@ -41,7 +42,8 @@ it('returns a 400 when trying to create an order with a reserved ticket', async 
 })
 
 it('returns a 201 when successfully creating an order', async () => {
-  const ticket = new Ticket({
+  const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'order',
     price: 200
   })
@@ -57,7 +59,8 @@ it('returns a 201 when successfully creating an order', async () => {
 })
 
 it('emits an order created event', async () => {
-  const ticket = new Ticket({
+  const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'order',
     price: 200
   })
