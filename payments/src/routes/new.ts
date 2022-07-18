@@ -1,8 +1,11 @@
 import express, { Request, Response } from "express";
 import { BadRequestError, NotFoundError, NotAuthorizedError, validateRequest, requireAuth, OrderStatus } from "@bamtickets/common";
 import { body } from "express-validator";
-import { Order, } from "../models/order";
+import { Order } from "../models/order";
+import { Payment } from '../models/payment';
 import { stripe } from "../stripe";
+import { PaymentCreatedPublisher } from "../events/publishers/payment-created-publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 
 
@@ -30,13 +33,23 @@ async (req:Request, res: Response) => {
     throw new BadRequestError('You can not pay for a cancelled order');
   }
 
-  await stripe.charges.create({
+  const stripeCharge = await stripe.charges.create({
     currency: 'usd',
     amount: order.price * 100,
     source: token
   })
 
-  res.status(201).send({success: true})
+  const payment = Payment.build({
+    orderId,
+    chargeId: stripeCharge.id
+  });
+  await payment.save();
+  new PaymentCreatedPublisher(natsWrapper.client).publish({
+    id: payment.id,
+    orderId: payment.orderId,
+    chargeId: payment.chargeId
+  })
+  res.status(201).send({id: payment.id})
 
 })
 
